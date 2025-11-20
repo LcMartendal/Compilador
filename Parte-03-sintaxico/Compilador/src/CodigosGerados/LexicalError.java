@@ -1,4 +1,5 @@
-package Compilador;
+
+package CodigosGerados;
 
 public class LexicalError extends AnalysisError
 {

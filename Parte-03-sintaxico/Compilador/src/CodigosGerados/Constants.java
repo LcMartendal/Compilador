@@ -1,4 +1,5 @@
-package Compilador;
+
+package CodigosGerados;
 
 public interface Constants extends ScannerConstants, ParserConstants
 {

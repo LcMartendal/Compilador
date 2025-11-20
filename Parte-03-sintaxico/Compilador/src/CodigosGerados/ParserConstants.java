@@ -1,4 +1,4 @@
-package Compilador;
+package CodigosGerados;
 
 public interface ParserConstants
 {

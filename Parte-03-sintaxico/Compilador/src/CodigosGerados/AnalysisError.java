@@ -1,4 +1,4 @@
-package Compilador;
+package CodigosGerados;
 
 public class AnalysisError extends Exception
 {

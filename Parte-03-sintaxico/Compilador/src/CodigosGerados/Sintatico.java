@@ -1,4 +1,4 @@
-package Compilador;
+package CodigosGerados;
 
 import java.util.Stack;
 

@@ -25,6 +25,13 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import CodigosGerados.LexicalError;
+import CodigosGerados.Lexico;
+import CodigosGerados.SemanticError;
+import CodigosGerados.Semantico;
+import CodigosGerados.Sintatico;
+import CodigosGerados.SyntaticError;
+
 /**
  *
  * @author Lc Martendal
@@ -479,13 +486,15 @@ public class Compilador extends javax.swing.JFrame {
                 taMensagem.setText("linha " + indicaLinha(e.getPosition()) + ": " + e.getMessage());
 
         } catch (SyntaticError e) {
-            /*if(taEditor.getText().length()-1 <= e.getPosition()){
-                taMensagem.setText(
-                        "linha " + indicaLinha(e.getPosition()) + ": encontrado EOF "
-                                + e.getMessage());
-                return;
-            }*/
-
+            /*
+             * if(taEditor.getText().length()-1 <= e.getPosition()){
+             * taMensagem.setText(
+             * "linha " + indicaLinha(e.getPosition()) + ": encontrado EOF "
+             * + e.getMessage());
+             * return;
+             * }
+             */
+            taEditor.append(" ");
             String lexComErro = "";
             int pos = e.getPosition();
             int limite = taEditor.getText().length();
@@ -493,20 +502,20 @@ public class Compilador extends javax.swing.JFrame {
             while (true && pos < limite) {
                 char c = taEditor.getText().charAt(pos++);
 
-                if ( ( c == ' ' || c == '\n' || c == '\r' || c == ')' || c == '\s' ) ) break;
+                if ((c == ' ' || c == '\n' || c == '\r' || c == ')' || c == '\s'))
+                    break;
 
-                else if ( c != ' ' ) lexComErro += c;
+                else if (c != ' ')
+                    lexComErro += c;
             }
 
-            //if (lexComErro.equals(" ")) lexComErro = "EOF";
+            // if (lexComErro.equals(" ")) lexComErro = "EOF";
 
-            if (lexComErro.startsWith("\"")){
-                taMensagem.setText("linha " + indicaLinha(pos) + ": encontrado constante_string " + e.getMessage());
-            }else if(lexComErro.equals("")){
-                taMensagem.setText("linha " + indicaLinha(e.getPosition()) + ": encontrado EOF esperado expressão");
-            }else
-                taMensagem.setText("linha " + indicaLinha(e.getPosition()) + ": encontrado " + lexComErro + " " + e.getMessage());
+            taMensagem.setText("linha " + indicaLinha(e.getPosition()) + ": encontrado "
+                    + ((lexComErro.startsWith("\"")) ? "constante_string" : (lexComErro.equals("")) ? "EOF" : lexComErro)
+                    + " " + e.getMessage());
 
+            taEditor.setText(taEditor.getText().substring(0, taEditor.getText().length() - 1));
         } catch (
 
         SemanticError e) {
