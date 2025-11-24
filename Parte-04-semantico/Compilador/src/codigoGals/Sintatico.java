@@ -4,6 +4,7 @@ import java.util.Stack;
 
 public class Sintatico implements Constants
 {
+    @SuppressWarnings("rawtypes")
     private Stack stack = new Stack();
     private Token currentToken;
     private Token previousToken;
@@ -20,6 +21,7 @@ public class Sintatico implements Constants
         return x >= FIRST_NON_TERMINAL && x < FIRST_SEMANTIC_ACTION;
     }
 
+    @SuppressWarnings("unused")
     private static final boolean isSemanticAction(int x)
     {
         return x >= FIRST_SEMANTIC_ACTION;
@@ -75,6 +77,7 @@ public class Sintatico implements Constants
         }
     }
 
+    @SuppressWarnings({ "removal", "unchecked" })
     private boolean pushProduction(int topStack, int tokenInput)
     {
         int p = PARSER_TABLE[topStack-FIRST_NON_TERMINAL][tokenInput-1];
@@ -92,6 +95,7 @@ public class Sintatico implements Constants
             return false;
     }
 
+    @SuppressWarnings({ "unchecked", "removal" })
     public void parse(Lexico scanner, Semantico semanticAnalyser) throws LexicalError, SyntaticError, SemanticError
     {
         this.scanner = scanner;
