@@ -39,6 +39,7 @@ import codigoGals.SyntaticError;
 public class Compilador extends javax.swing.JFrame {
 
     private File arquivo = null;
+    private String codigoIl = "";
 
     /**
      * Creates new form Compilador
@@ -436,9 +437,15 @@ public class Compilador extends javax.swing.JFrame {
 
                 taMensagem.setText("");
             }
+            
+            if (codigoIl == null || codigoIl.isBlank()) {
+                JOptionPane.showMessageDialog(this, "Compile o programa antes de gerar o arquivo IL.");
+                return;
+            }
+            geradorDeArquivos.GeradorArquivoIL.gerarIL(codigoIl, arquivo);
 
         } catch (Exception e) {
-
+            System.out.println(e.getMessage());
         }
     }// GEN-LAST:event_btSalvarActionPerformed
 
@@ -472,11 +479,12 @@ public class Compilador extends javax.swing.JFrame {
 
         Sintatico sintatico = new Sintatico();
         Semantico semantico = new Semantico();
+        this.codigoIl = semantico.getCodigo();
 
         try {
             sintatico.parse(lexico, semantico);
+            this.codigoIl = semantico.getCodigo();
             taMensagem.setText("programa compilado com sucesso");
-            System.out.println(semantico.getCodigo());
 
         } catch (LexicalError e) {
             char lexComErro = taEditor.getText().charAt(e.getPosition());
