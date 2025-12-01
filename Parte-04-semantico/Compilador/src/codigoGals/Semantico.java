@@ -1,24 +1,24 @@
 package codigoGals;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import javax.management.RuntimeErrorException;
-
 public class Semantico implements Constants {
     Stack<String> pilha_tipos = new Stack<String>();
-    private String codigo = "";
-
-    // ****
+    private String codigo_objeto = "";
     String operador_relacional = "";
     String tipo = "";
+    Stack<String> pilha_rotulos = new Stack<>();
     List<String> lista_identificadores = new ArrayList<>();
-    // ****
+    HashMap<String, String> tabela_simbolos = new HashMap<>();
 
-    public String getCodigo() {
-        return codigo;
+    public String getCodigo_objeto() {
+        return codigo_objeto;
     }
+
+    private int contLabel = 0;
 
     public void executeAction(int action, Token token) throws SemanticError {
         // fazer switch case para cada açao semantica
@@ -53,40 +53,77 @@ public class Semantico implements Constants {
             case 109:
                 acao109(token);
                 break;
-            // case 110:
-            // acao110(token);
-            // break;
-            // case 111:
-            // acao111(token);
-            // break;
-            // case 112:
-            // acao112(token);
-            // break;
-            // case 113:
-            // acao113(token);
-            // break;
-            // case 114:
-            // acao104(token);
-            // break;
-            // case 115:
-            // acao115(token);
-            // break;
-            // case 116:
-            // acao116(token);
-            // break;
-            // case 117:
-            // acao117(token);
-            // break;
-            // case 118:
-            // acao118();
-            // break;
-            // case 119:
-            // acao119(token);
-        }
+            case 110:
+                acao110(token);
+                break;
+            case 111:
+                acao111(token);
+                break;
+            case 112:
+                acao112(token);
+                break;
+            case 113:
+                acao113(token);
+                break;
+            case 114:
+                acao114(token);
+                break;
+            case 115:
+                acao115(token);
+                break;
+            case 116:
+                acao116(token);
+                break;
+            case 117:
+                acao117(token);
+                break;
+            case 118:
+                acao118();
+                break;
+            case 119:
+                acao119();
+                break;
+            case 120:
+                acao120(token);
+                break;
+            case 121:
+                acao121(token);
+                break;
+            case 122:
+                acao122(token);
+                break;
+            case 123:
+                acao123(token);
+                break;
+            case 124:
+                acao124(token);
+                break;
+            case 125:
+                acao125(token);
+                break;
+            case 126:
+                acao126(token);
+                break;
+            case 127:
+                acao127(token);
+                break;
+            case 128:
+                acao128(token);
+                break;
+            case 129:
+                acao129(token);
+                break;
+            case 130:
+                acao130(token);
+                break;
+            default:
+                // ação não implementada
+                throw new SemanticError("Ação semântica não implementada: " + action);
+        }        
     }
 
     void acao100() {
-        codigo = ".assembly extern mscorlib {}\n" +
+        codigo_objeto = ".assembly extern mscorlib {}\n" +
                 ".assembly _programa{}\n" +
                 ".module _programa.exe\n" +
                 "\n" +
@@ -96,7 +133,7 @@ public class Semantico implements Constants {
     }
 
     void acao101() {
-        codigo += "  ret\n" +
+        codigo_objeto += "  ret\n" +
                 " }\n" +
                 "}\n";
     }
@@ -106,49 +143,53 @@ public class Semantico implements Constants {
             String tipo = pilha_tipos.pop();
 
             if (tipo.equals("int64")) {
-                codigo += "  conv.i8\n" + "  call void [mscorlib]System.Console::Write(int64)\n";
+                codigo_objeto += "  conv.i8\n" + "  call void [mscorlib]System.Console::Write(int64)\n";
             } else
-                codigo += "  call void [mscorlib]System.Console::Write(" + tipo + ")\n";
+                codigo_objeto += "  call void [mscorlib]System.Console::Write(" + tipo + ")\n";
 
         } else
             throw new RuntimeException("Pilha vazia");
 
     }
 
-    // void acao118(Token token) {
-    // }
+    void acao118() {
+        codigo_objeto += "  call void [mscorlib]System.Console::WriteLine()\n";
+    }
 
     void acao103(Token token) {
         pilha_tipos.push("int64");
-        codigo += "  ldc.i8 " + token.getLexeme() + "\n"
+        codigo_objeto += "  ldc.i8 " + token.getLexeme() + "\n"
                 + "  conv.r8\n";
     }
 
     void acao104(Token token) {
         pilha_tipos.push("float64");
-        codigo += "  ldc.r8 " + token.getLexeme() + "\n";
+        codigo_objeto += "  ldc.r8 " + token.getLexeme() + "\n";
     }
 
     void acao105(Token token) {
         pilha_tipos.push("string");
-        codigo += "  ldstr " + token.getLexeme() + "\n";
+        codigo_objeto += "  ldstr " + token.getLexeme() + "\n";
     }
 
     void acao115(Token token) {
         pilha_tipos.push("bool");
-        codigo += "  ldc.i4.1\n";
+        codigo_objeto += "  ldc.i4.1\n";
     }
 
     void acao116(Token token) {
         pilha_tipos.push("bool");
-        codigo += "  ldc.i4.0\n";
+        codigo_objeto += "  ldc.i4.0\n";
     }
 
-    // void acao110(Token token){
+    void acao110(Token token) { // não há necessidade de tirar e colocar tipo na pilha
+        codigo_objeto += "  ldc.r8 -1\n"
+                + "  mul\n";
+    }
 
-    // }
-
-    void acao106(Token token) {
+    void acao106(Token token) throws SemanticError {
+        if (pilha_tipos.size() < 2)
+            throw new SemanticError("Operador '+' com menos de 2 operandos ", token.getPosition());
         String tipo2 = pilha_tipos.pop();
         String tipo1 = pilha_tipos.pop();
 
@@ -157,10 +198,12 @@ public class Semantico implements Constants {
         } else {
             pilha_tipos.push("float64");
         }
-        codigo += "  add\n";
+        codigo_objeto += "  add\n";
     }
 
-    void acao107(Token token) {
+    void acao107(Token token) throws SemanticError {
+        if (pilha_tipos.size() < 2)
+            throw new SemanticError("Operador '-' com menos de 2 operandos ", token.getPosition());
         String tipo2 = pilha_tipos.pop();
         String tipo1 = pilha_tipos.pop();
 
@@ -169,10 +212,12 @@ public class Semantico implements Constants {
         } else {
             pilha_tipos.push("float64");
         }
-        codigo += "  sub\n";
+        codigo_objeto += "  sub\n";
     }
 
-    void acao108(Token token) {
+    void acao108(Token token) throws SemanticError {
+        if (pilha_tipos.size() < 2)
+            throw new SemanticError("Operador '*' com menos de 2 operandos ", token.getPosition());
         String tipo2 = pilha_tipos.pop();
         String tipo1 = pilha_tipos.pop();
 
@@ -181,124 +226,223 @@ public class Semantico implements Constants {
         } else {
             pilha_tipos.push("float64");
         }
-        codigo += "  mul\n";
+        codigo_objeto += "  mul\n";
     }
 
-    void acao109(Token token) {
+    void acao109(Token token) throws SemanticError {
+        if (pilha_tipos.size() < 2)
+            throw new SemanticError("Operador '/' com menos de 2 operandos ", token.getPosition());
         pilha_tipos.pop();
         pilha_tipos.pop();
 
         pilha_tipos.push("float64");
-        codigo += "  div\n";
+        codigo_objeto += "  div\n";
     }
 
     void acao111(Token token) {
         operador_relacional = token.getLexeme();
     }
 
-    void acao112(Token token) {
+    void acao112(Token token) throws SemanticError {
+        if (pilha_tipos.size() < 2)
+            throw new SemanticError("Operador relacional com menos de 2 operandos ", token.getPosition());
         pilha_tipos.pop();
         pilha_tipos.pop();
-
+        pilha_tipos.push("bool");
         if (operador_relacional.equals("==")) {
-            codigo += "  ceq\n";
+            codigo_objeto += "  ceq\n";
         } else if (operador_relacional.equals("~=")) {
-            codigo += "  ceq\n" +
+            codigo_objeto += "  ceq\n" +
                     "  ldc.i4.1\n" +
                     "  xor\n";
         } else if (operador_relacional.equals("<")) {
-            codigo += "  clt\n";
+            codigo_objeto += "  clt\n";
         } else if (operador_relacional.equals(">")) {
-            codigo += "  cgt\n";
+            codigo_objeto += "  cgt\n";
         }
     }
 
     void acao117(Token token) {
-        codigo += "  ldc.i4.1\n" +
+        codigo_objeto += "  ldc.i4.1\n" +
                 "  xor\n";
     }
 
-    // void acao113(Token token) { //perguntar a professora sobre o 113 e 114
-    // String tipo2 = pilha_tipos.pop();
-    // String tipo1 = pilha_tipos.pop();
+    void acao113(Token token) throws SemanticError {
+        if (pilha_tipos.size() < 2)
+            throw new SemanticError("Operador 'and' com menos de 2 operandos ", token.getPosition());
+        String tipo2 = pilha_tipos.pop();
+        String tipo1 = pilha_tipos.pop();
 
-    // if (tipo1.equals("bool") && tipo2.equals("bool")) {
-    // pilha_tipos.push("bool");
-    // codigo += "and\n";
-    // }
-    // }
+        if (!tipo1.equals("bool") || !tipo2.equals("bool")) {
+            throw new SemanticError("Operador 'and' em operandos não booleanos", token.getPosition());
+        }
 
-    // void acao114(Token token) {
-    // String tipo2 = pilha_tipos.pop();
-    // String tipo1 = pilha_tipos.pop();
+        pilha_tipos.push("bool");
+        codigo_objeto += "  add\n";
+    }
 
-    // if (tipo1.equals("bool") && tipo2.equals("bool")) {
-    // pilha_tipos.push("bool");
-    // codigo += "or\n";
-    // }
-    // }
+    void acao114(Token token) throws SemanticError {
+        if (pilha_tipos.size() < 2)
+            throw new SemanticError("Operador 'or' com menos de 2 operandos ", token.getPosition());
+        String tipo2 = pilha_tipos.pop();
+        String tipo1 = pilha_tipos.pop();
 
-    // void acao120(Token token) {
-    // tipo = token.getLexeme();
-    // }
+        if (!tipo1.equals("bool") || !tipo2.equals("bool")) {
+            throw new SemanticError("Operador 'or' em operandos não booleanos", token.getPosition());
+        }
 
-    // void acao121(Token token) {
-    // lista_identificadores.add(token.getLexeme());
-    // }
+        pilha_tipos.push("bool");
+        codigo_objeto += "or\n";
+    }
 
-    // // void acao119(Token token) {
+    void acao120(Token token) {
+        tipo = token.getLexeme();
+    }
 
-    // // }
+    void acao121(Token token) throws SemanticError {
+        if (tipo == null || tipo.isEmpty()) {
+            throw new SemanticError("Tipo não definido na declaração", token.getPosition());
+        }
 
-    // void acao122(Token token) {
-    // String tipo_expressao = pilha_tipos.pop();
+        lista_identificadores.add(token.getLexeme());
+    }
 
-    // if(tipo_expressao.equals("int64")) {
-    // codigo += "conv.i8\n";
-    // }
+    void acao119() throws SemanticError {
+        if (tipo == null || tipo.isEmpty()) {
+            throw new SemanticError("Tipo não definido na declaração");
+        }
+        String tipoIL = "";
+        switch (tipo) {
+            case "int":
+            case "pr_int":
+                tipoIL = "int64";
+                break;
+            case "float":
+            case "pr_float":
+                tipoIL = "float64";
+                break;
+            case "string":
+            case "pr_string":
+                tipoIL = "string";
+                break;
+            case "bool":
+            case "pr_bool":
+                tipoIL = "bool";
+                break;
+            default:
+                throw new SemanticError("Tipo não definido na declaração" + tipo);
+        }
+        for (String id : lista_identificadores) {
+            if (tabela_simbolos.containsKey(id)) {
+                throw new SemanticError("Identificador já declarado: " + id);
+            }
+            tabela_simbolos.put(id, tipoIL);
+            codigo_objeto += "  .locals (" + tipoIL + " " + id + ")\n";
+        }
+        lista_identificadores.clear();
+        tipo = "";
+    }
 
-    // String id = lista_identificadores.getFirst();
-    // codigo += "stloc " + id + "\n";
-    // lista_identificadores.remove(0);
-    // }
+    void acao122(Token token) throws SemanticError {
+        if (lista_identificadores.isEmpty())
+            throw new SemanticError("Nenhum identificador para atribuição", token.getPosition());
+        if (pilha_tipos.isEmpty())
+            throw new SemanticError("Expressão vazia na atribuição", token.getPosition());
+        String tipoExpr = pilha_tipos.pop();
+        if (tipoExpr.equals("int64")) {
+            codigo_objeto += "  conv.i8\n";
+        }
+        String id = lista_identificadores.remove(lista_identificadores.size() - 1);
+        if (!tabela_simbolos.containsKey(id)) {
+            throw new SemanticError("Identificador não declarado em atribuição: " + id, token.getPosition());
+        }
+        codigo_objeto += "  stloc " + id + "\n";
+    }
 
-    // void acao123(Token token) {
-    // String id = token.getLexeme();
+    void acao123(Token token) throws SemanticError {
+        String id = token.getLexeme();
+        if (!tabela_simbolos.containsKey(id)) {
+            throw new SemanticError("Identificador não declarado em comando de entrada: " + id, token.getPosition());
+        }
+        String tipoId = tabela_simbolos.get(id);
+        if (tipoId.equals("bool")) {
+            throw new SemanticError(id + " inválido para comando de entrada", token.getPosition());
+        }
+        codigo_objeto += "  call string [mscorlib]System.Console::ReadLine()\n";
+        if (tipoId.equals("int64")) {
+            codigo_objeto += "  call int64 [mscorlib]System.Int64::Parse(string)\n";
+        } else if (tipoId.equals("float64")) {
+            codigo_objeto += "  call float64 [mscorlib]System.Double::Parse(string)\n";
+        } else if (tipoId.equals("string")) {
+        } else {
+            throw new SemanticError("Tipo inválido em comando de entrada: " + tipoId, token.getPosition());
+        }
+        codigo_objeto += "  stloc " + id + "\n";
+    }
 
-    // if(id.equals("bool")){
-    // //deve lançar um erro TEM QUE FAZER ISSO AQUI***
-    // }else
-    // codigo += "call "+ id +" [mscorlib] System." +
-    // id.substring(0,1).toUpperCase() + id.substring(1) + "::Parse(string)\n";
-    // codigo += "stloc " + id + "\n";
-    // }
+    void acao124(Token token) {
+        codigo_objeto += "  ldstr " + token.getLexeme() + "\n";
+        codigo_objeto += "  call void [mscorlib]System.Console::Write(string)\n";
+    }
 
-    // void acao124(Token token) {
-    // codigo += "ldstr " + token.getLexeme() + "\n";
-    // codigo += "call void [mscorlib]System.Console::Write(string)\n";
-    // }
+    void acao130(Token token) throws SemanticError {
+        String id = token.getLexeme();
+        if (!tabela_simbolos.containsKey(id)) {
+            throw new SemanticError("Identificador não declarado em expressão: " + id, token.getPosition());
+        }
+        String tipoId = tabela_simbolos.get(id);
+        pilha_tipos.push(tipoId);
+        codigo_objeto += "  ldloc " + id + "\n";
+        if (tipoId.equals("int64")) {
+            codigo_objeto += "  conv.r8\n";
+        }
+    }
 
-    // void acao130(Token token) {
+    void acao125(Token token) throws SemanticError {
+        if (pilha_tipos.isEmpty())
+            throw new SemanticError("Expressão vazia em comando de seleção", token.getPosition());
+        String tipoExpr = pilha_tipos.pop();
+        if (!tipoExpr.equals("bool")) {
+            throw new SemanticError("expressão incompatível em comando de seleção", token.getPosition());
+        }
+        String r = "L" + (contLabel++);
+        codigo_objeto += "  brfalse " + r + "\n";
+        pilha_rotulos.push(r);
+    }
 
-    // }
+    void acao127(Token token) throws SemanticError {
+        String novo2 = "L" + (contLabel++);
+        codigo_objeto += "  br " + novo2 + "\n";
+        if (pilha_rotulos.isEmpty())
+            throw new SemanticError("Pilha de rótulos vazia em acao127", token.getPosition());
+        String novo1 = pilha_rotulos.pop();
+        codigo_objeto += novo1 + ":\n";
+        pilha_rotulos.push(novo2);
+    }
 
-    // void acao125(Token token) {
+    void acao126(Token token) throws SemanticError {
+        if (pilha_rotulos.isEmpty())
+            throw new SemanticError("Pilha de rótulos vazia em acao126", token.getPosition());
+        String r = pilha_rotulos.pop();
+        codigo_objeto += r + ":\n";
+    }
 
-    // }
+    void acao128(Token token) {
+        String r = "L" + (contLabel++);
+        codigo_objeto += r + ":\n";
+        pilha_rotulos.push(r);
+    }
 
-    // void acao127(Token token) {
-
-    // }
-
-    // void acao126(Token token) {
-
-    // }
-
-    // void acao128(Token token) {
-
-    // }
-
-    // void acao129(Token token) {
-
-    // }
+    void acao129(Token token) throws SemanticError {
+        if (pilha_tipos.isEmpty())
+            throw new SemanticError("Expressão vazia em comando de repetição", token.getPosition());
+        String tipoExpr = pilha_tipos.pop();
+        if (!tipoExpr.equals("bool")) {
+            throw new SemanticError("expressão incompatível em comando de repetição", token.getPosition());
+        }
+        if (pilha_rotulos.isEmpty())
+            throw new SemanticError("Pilha de rótulos vazia em acao129", token.getPosition());
+        String rot = pilha_rotulos.pop();
+        codigo_objeto += "  brfalse " + rot + "\n";
+    }
 }

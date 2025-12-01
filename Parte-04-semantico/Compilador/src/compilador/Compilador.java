@@ -479,11 +479,11 @@ public class Compilador extends javax.swing.JFrame {
 
         Sintatico sintatico = new Sintatico();
         Semantico semantico = new Semantico();
-        this.codigoIl = semantico.getCodigo();
+        this.codigoIl = semantico.getCodigo_objeto();
 
         try {
             sintatico.parse(lexico, semantico);
-            this.codigoIl = semantico.getCodigo();
+            this.codigoIl = semantico.getCodigo_objeto();
             taMensagem.setText("programa compilado com sucesso");
 
         } catch (LexicalError e) {
