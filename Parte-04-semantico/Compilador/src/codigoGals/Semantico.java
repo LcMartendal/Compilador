@@ -300,10 +300,6 @@ public class Semantico implements Constants {
     }
 
     void acao121(Token token) throws SemanticError {
-        if (tipo == null || tipo.isEmpty()) {
-            throw new SemanticError("Tipo não definido na declaração", token.getPosition());
-        }
-
         lista_identificadores.add(token.getLexeme());
     }
 
